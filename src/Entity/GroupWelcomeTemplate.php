@@ -13,12 +13,6 @@ use Tourze\DoctrineTimestampBundle\Traits\TimestampableAware;
 use Tourze\DoctrineTrackBundle\Attribute\TrackColumn;
 use Tourze\DoctrineUserBundle\Attribute\CreatedByColumn;
 use Tourze\DoctrineUserBundle\Attribute\UpdatedByColumn;
-use Tourze\EasyAdmin\Attribute\Action\Creatable;
-use Tourze\EasyAdmin\Attribute\Action\Deletable;
-use Tourze\EasyAdmin\Attribute\Action\Editable;
-use Tourze\EasyAdmin\Attribute\Column\BoolColumn;
-use Tourze\EasyAdmin\Attribute\Column\ExportColumn;
-use Tourze\EasyAdmin\Attribute\Column\ListColumn;
 use Tourze\WechatWorkContracts\AgentInterface;
 use WechatWorkGroupWelcomeTemplateBundle\Repository\GroupWelcomeTemplateRepository;
 use WechatWorkMediaBundle\Entity\TempMedia;
@@ -26,16 +20,11 @@ use WechatWorkMediaBundle\Entity\TempMedia;
 /**
  * @see https://developer.work.weixin.qq.com/document/path/92366#%E6%B7%BB%E5%8A%A0%E5%85%A5%E7%BE%A4%E6%AC%A2%E8%BF%8E%E8%AF%AD%E7%B4%A0%E6%9D%90
  */
-#[Deletable]
-#[Editable]
-#[Creatable]
 #[ORM\Entity(repositoryClass: GroupWelcomeTemplateRepository::class)]
 #[ORM\Table(name: 'wechat_work_group_welcome_template', options: ['comment' => '工作组欢迎模板'])]
 class GroupWelcomeTemplate
 {
     use TimestampableAware;
-    #[ExportColumn]
-    #[ListColumn(order: -1, sorter: true)]
     #[ORM\Id]
     #[ORM\GeneratedValue(strategy: 'CUSTOM')]
     #[ORM\CustomIdGenerator(SnowflakeIdGenerator::class)]
@@ -99,12 +88,10 @@ class GroupWelcomeTemplate
     #[ORM\ManyToOne]
     private ?TempMedia $videoMedia = null;
 
-    #[BoolColumn]
     #[IndexColumn]
     #[TrackColumn]
     #[Groups(['admin_curd'])]
     #[ORM\Column(type: Types::BOOLEAN, nullable: true, options: ['comment' => '已同步', 'default' => 0])]
-    #[ListColumn(order: 97)]
     private ?bool $sync = null;
 
     #[CreateIpColumn]
