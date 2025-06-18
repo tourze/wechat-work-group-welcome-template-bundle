@@ -73,10 +73,7 @@ class EditGroupWelcomeTemplateRequestTest extends TestCase
         $this->request->setTextContent('更新的欢迎语内容');
 
         $options = $this->request->getRequestOptions();
-
-        $this->assertIsArray($options);
         $this->assertArrayHasKey('json', $options);
-        $this->assertIsArray($options['json']);
         $this->assertArrayHasKey('notify', $options['json']);
         $this->assertArrayHasKey('text', $options['json']);
         $this->assertSame(0, $options['json']['notify']);
@@ -232,10 +229,7 @@ class EditGroupWelcomeTemplateRequestTest extends TestCase
         $this->request->setTextContent('格式测试');
         
         $options = $this->request->getRequestOptions();
-
-        $this->assertIsArray($options);
         $this->assertArrayHasKey('json', $options);
-        $this->assertIsArray($options['json']);
     }
 
     public function test_contentUpdate_preservesTemplateId(): void

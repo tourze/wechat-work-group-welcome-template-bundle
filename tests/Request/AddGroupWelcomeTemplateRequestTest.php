@@ -72,10 +72,7 @@ class AddGroupWelcomeTemplateRequestTest extends TestCase
         $this->request->setTextContent('测试欢迎语');
 
         $options = $this->request->getRequestOptions();
-
-        $this->assertIsArray($options);
         $this->assertArrayHasKey('json', $options);
-        $this->assertIsArray($options['json']);
         $this->assertArrayHasKey('notify', $options['json']);
         $this->assertArrayHasKey('text', $options['json']);
         $this->assertSame(1, $options['json']['notify']);
@@ -183,8 +180,6 @@ class AddGroupWelcomeTemplateRequestTest extends TestCase
         // 测试空请求选项（只有默认notify）
         $options = $this->request->getRequestOptions();
         $json = $options['json'];
-
-        $this->assertIsArray($json);
         $this->assertArrayHasKey('notify', $json);
         $this->assertSame(1, $json['notify']); // 默认为true
         $this->assertCount(1, $json);
@@ -195,10 +190,7 @@ class AddGroupWelcomeTemplateRequestTest extends TestCase
         // 测试请求选项返回格式
         $this->request->setTextContent('测试内容');
         $options = $this->request->getRequestOptions();
-
-        $this->assertIsArray($options);
         $this->assertArrayHasKey('json', $options);
-        $this->assertIsArray($options['json']);
     }
 
     public function test_imageMediaIdVsPicUrl(): void

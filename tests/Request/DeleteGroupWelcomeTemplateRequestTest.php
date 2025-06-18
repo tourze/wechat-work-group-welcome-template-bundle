@@ -100,10 +100,7 @@ class DeleteGroupWelcomeTemplateRequestTest extends TestCase
         $this->request->setTemplateId($templateId);
 
         $options = $this->request->getRequestOptions();
-
-        $this->assertIsArray($options);
         $this->assertArrayHasKey('json', $options);
-        $this->assertIsArray($options['json']);
         $this->assertArrayHasKey('template_id', $options['json']);
         $this->assertSame($templateId, $options['json']['template_id']);
     }
@@ -115,11 +112,8 @@ class DeleteGroupWelcomeTemplateRequestTest extends TestCase
         $this->request->setTemplateId($templateId);
 
         $options = $this->request->getRequestOptions();
-
-        $this->assertIsArray($options);
         $this->assertCount(1, $options); // 只有json键
         $this->assertArrayHasKey('json', $options);
-        $this->assertIsArray($options['json']);
         $this->assertCount(1, $options['json']); // 只有template_id键
         $this->assertArrayHasKey('template_id', $options['json']);
     }
@@ -157,7 +151,6 @@ class DeleteGroupWelcomeTemplateRequestTest extends TestCase
         $options = $this->request->getRequestOptions();
 
         $this->assertSame($templateId, $options['json']['template_id']);
-        $this->assertIsArray($options['json']);
     }
 
     public function test_businessScenario_deleteDuplicateTemplate(): void
@@ -292,11 +285,8 @@ class DeleteGroupWelcomeTemplateRequestTest extends TestCase
         $options = $this->request->getRequestOptions();
 
         // 验证格式符合企业微信API要求
-        $this->assertIsArray($options);
         $this->assertArrayHasKey('json', $options);
-        $this->assertIsArray($options['json']);
         $this->assertArrayHasKey('template_id', $options['json']);
-        $this->assertIsString($options['json']['template_id']);
     }
 
     public function test_destructiveOperation_confirmation(): void

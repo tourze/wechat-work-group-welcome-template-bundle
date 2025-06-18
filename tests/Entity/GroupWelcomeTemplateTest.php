@@ -436,7 +436,7 @@ class GroupWelcomeTemplateTest extends TestCase
      */
     public function test_setCreateTime_withValidDateTime_setsTimeCorrectly(): void
     {
-        $createTime = new \DateTime('2024-01-01 08:00:00');
+        $createTime = new \DateTimeImmutable('2024-01-01 08:00:00');
         
         $this->template->setCreateTime($createTime);
         
@@ -445,7 +445,7 @@ class GroupWelcomeTemplateTest extends TestCase
 
     public function test_setCreateTime_withNull_setsNull(): void
     {
-        $this->template->setCreateTime(new \DateTime());
+        $this->template->setCreateTime(new \DateTimeImmutable());
         
         $this->template->setCreateTime(null);
         
@@ -454,7 +454,7 @@ class GroupWelcomeTemplateTest extends TestCase
 
     public function test_setUpdateTime_withValidDateTime_setsTimeCorrectly(): void
     {
-        $updateTime = new \DateTime('2024-01-30 18:30:00');
+        $updateTime = new \DateTimeImmutable('2024-01-30 18:30:00');
         
         $this->template->setUpdateTime($updateTime);
         
@@ -463,7 +463,7 @@ class GroupWelcomeTemplateTest extends TestCase
 
     public function test_setUpdateTime_withNull_setsNull(): void
     {
-        $this->template->setUpdateTime(new \DateTime());
+        $this->template->setUpdateTime(new \DateTimeImmutable());
         
         $this->template->setUpdateTime(null);
         
@@ -540,8 +540,8 @@ class GroupWelcomeTemplateTest extends TestCase
 
     public function test_edgeCases_dateTimeTypes(): void
     {
-        // 测试DateTime
-        $dateTime = new \DateTime('2024-01-15 12:30:45');
+        // 测试DateTimeImmutable
+        $dateTime = new \DateTimeImmutable('2024-01-15 12:30:45');
         $this->template->setCreateTime($dateTime);
         $this->assertSame($dateTime, $this->template->getCreateTime());
         
@@ -559,7 +559,7 @@ class GroupWelcomeTemplateTest extends TestCase
         /** @var AgentInterface&MockObject $agent */
         $agent = $this->createMock(AgentInterface::class);
         
-        $createTime = new \DateTime('2024-01-15 10:00:00');
+        $createTime = new \DateTimeImmutable('2024-01-15 10:00:00');
         
         // 模拟纯文本欢迎模板
         $this->template
@@ -626,8 +626,8 @@ class GroupWelcomeTemplateTest extends TestCase
         /** @var AgentInterface&MockObject $agent */
         $agent = $this->createMock(AgentInterface::class);
         
-        $createTime = new \DateTime('2024-01-15 10:00:00');
-        $updateTime = new \DateTime('2024-01-15 10:30:00');
+        $createTime = new \DateTimeImmutable('2024-01-15 10:00:00');
+        $updateTime = new \DateTimeImmutable('2024-01-15 10:30:00');
         
         // 模拟模板同步流程
         $this->template
@@ -657,9 +657,9 @@ class GroupWelcomeTemplateTest extends TestCase
 
     public function test_businessScenario_templateVersioning(): void
     {
-        $createTime = new \DateTime('2024-01-15 08:00:00');
-        $firstUpdateTime = new \DateTime('2024-01-15 10:00:00');
-        $secondUpdateTime = new \DateTime('2024-01-15 14:00:00');
+        $createTime = new \DateTimeImmutable('2024-01-15 08:00:00');
+        $firstUpdateTime = new \DateTimeImmutable('2024-01-15 10:00:00');
+        $secondUpdateTime = new \DateTimeImmutable('2024-01-15 14:00:00');
         
         // 模拟模板版本变更
         $this->template->setTextContent('原始欢迎语');

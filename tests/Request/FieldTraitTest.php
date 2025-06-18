@@ -177,8 +177,6 @@ class FieldTraitTest extends TestCase
         $this->instance->setNotify(true);
 
         $json = $this->instance->getFieldJson();
-
-        $this->assertIsArray($json);
         $this->assertArrayHasKey('notify', $json);
         $this->assertSame(1, $json['notify']);
         $this->assertCount(1, $json);
@@ -206,7 +204,6 @@ class FieldTraitTest extends TestCase
         $this->assertArrayHasKey('notify', $json);
         $this->assertArrayHasKey('text', $json);
         $this->assertSame(1, $json['notify']);
-        $this->assertIsArray($json['text']);
         $this->assertArrayHasKey('content', $json['text']);
         $this->assertSame('欢迎加入群聊！', $json['text']['content']);
     }
@@ -220,7 +217,6 @@ class FieldTraitTest extends TestCase
         $json = $this->instance->getFieldJson();
 
         $this->assertArrayHasKey('image', $json);
-        $this->assertIsArray($json['image']);
         $this->assertArrayHasKey('media_id', $json['image']);
         $this->assertSame('image_media_123', $json['image']['media_id']);
     }
@@ -234,7 +230,6 @@ class FieldTraitTest extends TestCase
         $json = $this->instance->getFieldJson();
 
         $this->assertArrayHasKey('image', $json);
-        $this->assertIsArray($json['image']);
         $this->assertArrayHasKey('pic_url', $json['image']);
         $this->assertSame('https://example.com/image.jpg', $json['image']['pic_url']);
     }
@@ -251,7 +246,6 @@ class FieldTraitTest extends TestCase
         $json = $this->instance->getFieldJson();
 
         $this->assertArrayHasKey('link', $json);
-        $this->assertIsArray($json['link']);
         $this->assertArrayHasKey('title', $json['link']);
         $this->assertArrayHasKey('picurl', $json['link']);
         $this->assertArrayHasKey('desc', $json['link']);
@@ -274,7 +268,6 @@ class FieldTraitTest extends TestCase
         $json = $this->instance->getFieldJson();
 
         $this->assertArrayHasKey('miniprogram', $json);
-        $this->assertIsArray($json['miniprogram']);
         $this->assertArrayHasKey('title', $json['miniprogram']);
         $this->assertArrayHasKey('pic_media_id', $json['miniprogram']);
         $this->assertArrayHasKey('appid', $json['miniprogram']);
@@ -294,7 +287,6 @@ class FieldTraitTest extends TestCase
         $json = $this->instance->getFieldJson();
 
         $this->assertArrayHasKey('file', $json);
-        $this->assertIsArray($json['file']);
         $this->assertArrayHasKey('media_id', $json['file']);
         $this->assertSame('file_media_123', $json['file']['media_id']);
     }
@@ -308,7 +300,6 @@ class FieldTraitTest extends TestCase
         $json = $this->instance->getFieldJson();
 
         $this->assertArrayHasKey('video', $json);
-        $this->assertIsArray($json['video']);
         $this->assertArrayHasKey('media_id', $json['video']);
         $this->assertSame('video_media_123', $json['video']['media_id']);
     }
