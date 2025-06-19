@@ -22,7 +22,7 @@ use WechatWorkMediaBundle\Entity\TempMedia;
  */
 #[ORM\Entity(repositoryClass: GroupWelcomeTemplateRepository::class)]
 #[ORM\Table(name: 'wechat_work_group_welcome_template', options: ['comment' => '工作组欢迎模板'])]
-class GroupWelcomeTemplate
+class GroupWelcomeTemplate implements \Stringable
 {
     use TimestampableAware;
     #[ORM\Id]
@@ -357,4 +357,9 @@ class GroupWelcomeTemplate
     public function getUpdatedFromIp(): ?string
     {
         return $this->updatedFromIp;
-    }}
+    }
+    public function __toString(): string
+    {
+        return (string) $this->getId();
+    }
+}
