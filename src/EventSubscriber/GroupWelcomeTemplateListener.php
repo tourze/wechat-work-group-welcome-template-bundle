@@ -45,7 +45,7 @@ class GroupWelcomeTemplateListener
         }
 
         // 没模板ID的话，我们创建一次
-        if (!$template->getTemplateId()) {
+        if ($template->getTemplateId() === null) {
             $this->prePersist($template);
 
             return;
@@ -61,7 +61,7 @@ class GroupWelcomeTemplateListener
      */
     public function postRemove(GroupWelcomeTemplate $template): void
     {
-        if (!$template->getTemplateId()) {
+        if ($template->getTemplateId() === null) {
             return;
         }
 

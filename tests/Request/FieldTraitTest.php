@@ -352,11 +352,7 @@ class FieldTraitTest extends TestCase
 
     public function test_createFromEntity(): void
     {
-        // 测试从实体创建的静态方法存在
-        $this->assertTrue(method_exists(FieldTraitTestClass::class, 'createFromEntity'));
-        $this->assertTrue(is_callable([FieldTraitTestClass::class, 'createFromEntity']));
-        
-        // 验证方法是静态的
+        // 验证createFromEntity方法是静态的
         $reflection = new \ReflectionMethod(FieldTraitTestClass::class, 'createFromEntity');
         $this->assertTrue($reflection->isStatic());
     }
@@ -510,14 +506,14 @@ class FieldTraitTestClass
 {
     use FieldTrait;
     
-    private ?string $agent = null;
+    private ?\Tourze\WechatWorkContracts\AgentInterface $agent = null;
     
-    public function getAgent(): ?string
+    public function getAgent(): ?\Tourze\WechatWorkContracts\AgentInterface
     {
         return $this->agent;
     }
     
-    public function setAgent(?string $agent): void
+    public function setAgent(?\Tourze\WechatWorkContracts\AgentInterface $agent): void
     {
         $this->agent = $agent;
     }

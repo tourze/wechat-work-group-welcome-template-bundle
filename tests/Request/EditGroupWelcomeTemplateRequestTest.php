@@ -46,14 +46,6 @@ class EditGroupWelcomeTemplateRequestTest extends TestCase
         $this->assertSame($templateId, $this->request->getTemplateId());
     }
 
-    public function test_agent_methods(): void
-    {
-        // 测试AgentAware trait的方法存在性
-        $this->assertTrue(method_exists($this->request, 'setAgent'));
-        $this->assertTrue(method_exists($this->request, 'getAgent'));
-        $this->assertTrue(is_callable([$this->request, 'setAgent']));
-        $this->assertTrue(is_callable([$this->request, 'getAgent']));
-    }
 
     public function test_fieldTrait_functionality(): void
     {

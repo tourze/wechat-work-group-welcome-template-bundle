@@ -11,8 +11,7 @@ use Tourze\DoctrineIpBundle\Attribute\UpdateIpColumn;
 use Tourze\DoctrineSnowflakeBundle\Service\SnowflakeIdGenerator;
 use Tourze\DoctrineTimestampBundle\Traits\TimestampableAware;
 use Tourze\DoctrineTrackBundle\Attribute\TrackColumn;
-use Tourze\DoctrineUserBundle\Attribute\CreatedByColumn;
-use Tourze\DoctrineUserBundle\Attribute\UpdatedByColumn;
+use Tourze\DoctrineUserBundle\Traits\BlameableAware;
 use Tourze\WechatWorkContracts\AgentInterface;
 use WechatWorkGroupWelcomeTemplateBundle\Repository\GroupWelcomeTemplateRepository;
 use WechatWorkMediaBundle\Entity\TempMedia;
@@ -25,19 +24,13 @@ use WechatWorkMediaBundle\Entity\TempMedia;
 class GroupWelcomeTemplate implements \Stringable
 {
     use TimestampableAware;
+    use BlameableAware;
+    
     #[ORM\Id]
     #[ORM\GeneratedValue(strategy: 'CUSTOM')]
     #[ORM\CustomIdGenerator(SnowflakeIdGenerator::class)]
     #[ORM\Column(type: Types::BIGINT, nullable: false, options: ['comment' => 'ID'])]
     private ?string $id = null;
-
-    #[CreatedByColumn]
-    #[ORM\Column(nullable: true, options: ['comment' => '创建人'])]
-    private ?string $createdBy = null;
-
-    #[UpdatedByColumn]
-    #[ORM\Column(nullable: true, options: ['comment' => '更新人'])]
-    private ?string $updatedBy = null;
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
@@ -58,28 +51,28 @@ class GroupWelcomeTemplate implements \Stringable
     #[ORM\Column(length: 255, nullable: true, options: ['comment' => '图片链接'])]
     private ?string $imagePicUrl = null;
 
-    #[ORM\Column(length: 128, nullable: true)]
+    #[ORM\Column(length: 128, nullable: true, options: ['comment' => '链接标题'])]
     private ?string $linkTitle = null;
 
-    #[ORM\Column(length: 255, nullable: true)]
+    #[ORM\Column(length: 255, nullable: true, options: ['comment' => '链接图片URL'])]
     private ?string $linkPicUrl = null;
 
-    #[ORM\Column(length: 512, nullable: true)]
+    #[ORM\Column(length: 512, nullable: true, options: ['comment' => '链接描述'])]
     private ?string $linkDesc = null;
 
-    #[ORM\Column(length: 255, nullable: true)]
+    #[ORM\Column(length: 255, nullable: true, options: ['comment' => '链接URL'])]
     private ?string $linkUrl = null;
 
-    #[ORM\Column(length: 64, nullable: true)]
+    #[ORM\Column(length: 64, nullable: true, options: ['comment' => '小程序标题'])]
     private ?string $miniprogramTitle = null;
 
     #[ORM\ManyToOne]
     private ?TempMedia $miniprogramMedia = null;
 
-    #[ORM\Column(length: 64, nullable: true)]
+    #[ORM\Column(length: 64, nullable: true, options: ['comment' => '小程序AppId'])]
     private ?string $miniprogramAppId = null;
 
-    #[ORM\Column(length: 255, nullable: true)]
+    #[ORM\Column(length: 255, nullable: true, options: ['comment' => '小程序页面路径'])]
     private ?string $miniprogramPage = null;
 
     #[ORM\ManyToOne]
@@ -107,29 +100,6 @@ class GroupWelcomeTemplate implements \Stringable
         return $this->id;
     }
 
-    public function setCreatedBy(?string $createdBy): self
-    {
-        $this->createdBy = $createdBy;
-
-        return $this;
-    }
-
-    public function getCreatedBy(): ?string
-    {
-        return $this->createdBy;
-    }
-
-    public function setUpdatedBy(?string $updatedBy): self
-    {
-        $this->updatedBy = $updatedBy;
-
-        return $this;
-    }
-
-    public function getUpdatedBy(): ?string
-    {
-        return $this->updatedBy;
-    }
 
     public function getAgent(): ?AgentInterface
     {

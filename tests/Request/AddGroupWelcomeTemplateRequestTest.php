@@ -38,14 +38,6 @@ class AddGroupWelcomeTemplateRequestTest extends TestCase
         $this->assertSame($expectedPath, $this->request->getRequestPath());
     }
 
-    public function test_agent_setterAndGetter(): void
-    {
-        // 测试AgentAware trait的功能存在性
-        $this->assertTrue(method_exists($this->request, 'setAgent'));
-        $this->assertTrue(method_exists($this->request, 'getAgent'));
-        $this->assertTrue(is_callable([$this->request, 'setAgent']));
-        $this->assertTrue(is_callable([$this->request, 'getAgent']));
-    }
 
     public function test_notify_functionality(): void
     {
@@ -246,10 +238,6 @@ class AddGroupWelcomeTemplateRequestTest extends TestCase
 
     public function test_agentFieldHandling(): void
     {
-        // 测试代理字段处理 - 只检查方法存在性
-        $this->assertTrue(method_exists($this->request, 'setAgent'));
-        $this->assertTrue(method_exists($this->request, 'getAgent'));
-        
         // 代理字段不应出现在JSON中
         $options = $this->request->getRequestOptions();
         $this->assertArrayNotHasKey('agent', $options['json']);

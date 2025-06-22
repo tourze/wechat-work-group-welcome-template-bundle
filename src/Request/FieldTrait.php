@@ -78,7 +78,7 @@ trait FieldTrait
 
     public static function createFromEntity(GroupWelcomeTemplate $template): static
     {
-        $request = new self();
+        $request = new static();
         $request->setAgent($template->getAgent());
         $request->setNotify($template->isNotify());
 
