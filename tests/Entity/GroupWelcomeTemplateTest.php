@@ -10,7 +10,7 @@ use WechatWorkMediaBundle\Entity\TempMedia;
 
 /**
  * GroupWelcomeTemplate 实体测试用例
- * 
+ *
  * 测试群欢迎模板实体的所有功能
  */
 class GroupWelcomeTemplateTest extends TestCase

@@ -8,7 +8,7 @@ use Symfony\Component\Serializer\Attribute\Groups;
 use Tourze\DoctrineIndexedBundle\Attribute\IndexColumn;
 use Tourze\DoctrineIpBundle\Attribute\CreateIpColumn;
 use Tourze\DoctrineIpBundle\Attribute\UpdateIpColumn;
-use Tourze\DoctrineSnowflakeBundle\Service\SnowflakeIdGenerator;
+use Tourze\DoctrineSnowflakeBundle\Traits\SnowflakeKeyAware;
 use Tourze\DoctrineTimestampBundle\Traits\TimestampableAware;
 use Tourze\DoctrineTrackBundle\Attribute\TrackColumn;
 use Tourze\DoctrineUserBundle\Traits\BlameableAware;
@@ -23,14 +23,9 @@ use WechatWorkMediaBundle\Entity\TempMedia;
 #[ORM\Table(name: 'wechat_work_group_welcome_template', options: ['comment' => '工作组欢迎模板'])]
 class GroupWelcomeTemplate implements \Stringable
 {
+    use SnowflakeKeyAware;
     use TimestampableAware;
     use BlameableAware;
-    
-    #[ORM\Id]
-    #[ORM\GeneratedValue(strategy: 'CUSTOM')]
-    #[ORM\CustomIdGenerator(SnowflakeIdGenerator::class)]
-    #[ORM\Column(type: Types::BIGINT, nullable: false, options: ['comment' => 'ID'])]
-    private ?string $id = null;
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
@@ -83,7 +78,7 @@ class GroupWelcomeTemplate implements \Stringable
 
     #[IndexColumn]
     #[TrackColumn]
-    #[Groups(['admin_curd'])]
+    #[Groups(groups: ['admin_curd'])]
     #[ORM\Column(type: Types::BOOLEAN, nullable: true, options: ['comment' => '已同步', 'default' => 0])]
     private ?bool $sync = null;
 
@@ -95,10 +90,6 @@ class GroupWelcomeTemplate implements \Stringable
     #[ORM\Column(length: 128, nullable: true, options: ['comment' => '更新时IP'])]
     private ?string $updatedFromIp = null;
 
-    public function getId(): ?string
-    {
-        return $this->id;
-    }
 
 
     public function getAgent(): ?AgentInterface
