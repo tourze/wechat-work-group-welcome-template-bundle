@@ -4,7 +4,15 @@ services:
     autowire: true      # Automatically injects dependencies in your services.
     autoconfigure: true # Automatically registers your services as commands, event subscribers, etc.
 
-  WechatWorkGroupWelcomeTemplateBundle\EventSubscriber\:
-    resource: '../../EventSubscriber/'
   WechatWorkGroupWelcomeTemplateBundle\Repository\:
     resource: '../../Repository/'
+
+  WechatWorkGroupWelcomeTemplateBundle\EventSubscriber\:
+    resource: '../../EventSubscriber/'
+
+  WechatWorkGroupWelcomeTemplateBundle\Controller\:
+    resource: '../../Controller/'
+    tags: ['controller.service_arguments']
+
+  WechatWorkGroupWelcomeTemplateBundle\Service\:
+    resource: '../../Service/'

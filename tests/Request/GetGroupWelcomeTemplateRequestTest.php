@@ -1,255 +1,214 @@
 <?php
 
+declare(strict_types=1);
+
 namespace WechatWorkGroupWelcomeTemplateBundle\Tests\Request;
 
-use HttpClientBundle\Request\ApiRequest;
-use PHPUnit\Framework\TestCase;
-use WechatWorkBundle\Request\AgentAware;
+use HttpClientBundle\Tests\Request\RequestTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
 use WechatWorkGroupWelcomeTemplateBundle\Request\GetGroupWelcomeTemplateRequest;
 
 /**
- * GetGroupWelcomeTemplateRequest 测试
+ * @internal
  */
-class GetGroupWelcomeTemplateRequestTest extends TestCase
+#[CoversClass(GetGroupWelcomeTemplateRequest::class)]
+final class GetGroupWelcomeTemplateRequestTest extends RequestTestCase
 {
     private GetGroupWelcomeTemplateRequest $request;
 
     protected function setUp(): void
     {
+        parent::setUp();
         $this->request = new GetGroupWelcomeTemplateRequest();
     }
 
-    public function test_inheritance(): void
+    public function testRequestCreation(): void
     {
-        // 测试继承关系
-        $this->assertInstanceOf(ApiRequest::class, $this->request);
+        $this->assertInstanceOf(GetGroupWelcomeTemplateRequest::class, $this->request);
     }
 
-    public function test_traits(): void
+    public function testGetRequestPath(): void
     {
-        // 测试使用的trait
-        $this->assertContains(AgentAware::class, class_uses($this->request));
+        $this->assertSame('/cgi-bin/externalcontact/group_welcome_template/get', $this->request->getRequestPath());
     }
 
-    public function test_getRequestPath(): void
+    public function testGetRequestOptionsReturnsJson(): void
     {
-        // 测试请求路径
-        $expectedPath = '/cgi-bin/externalcontact/group_welcome_template/get';
-        $this->assertSame($expectedPath, $this->request->getRequestPath());
+        $this->request->setTemplateId('test_template_123');
+
+        $options = $this->request->getRequestOptions();
+
+        $this->assertIsArray($options);
+        $this->assertArrayHasKey('json', $options);
+        $this->assertIsArray($options['json']);
     }
 
-    public function test_templateId_setterAndGetter(): void
+    public function testGetRequestOptionsWithTemplateId(): void
     {
-        // 测试模板ID设置和获取
-        $templateId = 'template_get_123456';
+        $templateId = 'test_template_123';
+        $this->request->setTemplateId($templateId);
+
+        $options = $this->request->getRequestOptions();
+
+        $this->assertIsArray($options);
+        $this->assertArrayHasKey('json', $options);
+        $json = $options['json'];
+        $this->assertIsArray($json);
+        $this->assertArrayHasKey('template_id', $json);
+        $this->assertSame($templateId, $json['template_id']);
+    }
+
+    public function testGetRequestOptionsWithoutTemplateId(): void
+    {
+        // templateId 是必需的属性，在未设置的情况下访问会抛出 Error
+        // 这个测试验证这种行为符合预期
+        $this->expectException(\Error::class);
+        $this->expectExceptionMessage('must not be accessed before initialization');
+
+        $this->request->getRequestOptions();
+    }
+
+    public function testTemplateIdGetterAndSetter(): void
+    {
+        $templateId = 'get_template_456';
+
         $this->request->setTemplateId($templateId);
         $this->assertSame($templateId, $this->request->getTemplateId());
     }
 
-    public function test_templateId_differentFormats(): void
+    public function testTemplateIdWithEmptyString(): void
     {
-        // 测试不同格式的模板ID
-        $formats = [
-            'simple_123',
-            'template_with_underscores_456',
-            'templateWithCamelCase789',
-            'template-with-dashes-012',
-            'TEMPLATE_UPPERCASE_345',
-            'template.with.dots.678',
-            'template123456789',
-            'a',
-            'very_long_template_id_with_many_characters_and_numbers_123456789'
-        ];
-
-        foreach ($formats as $templateId) {
-            $this->request->setTemplateId($templateId);
-            $this->assertSame($templateId, $this->request->getTemplateId());
-        }
-    }
-
-    public function test_templateId_specialCharacters(): void
-    {
-        // 测试包含特殊字符的模板ID
-        $specialIds = [
-            'template_中文_123',
-            'template_emoji_😀_456',
-            'template@symbol#789',
-            'template%encode&012',
-            'template$price*345'
-        ];
-
-        foreach ($specialIds as $templateId) {
-            $this->request->setTemplateId($templateId);
-            $this->assertSame($templateId, $this->request->getTemplateId());
-        }
-    }
-
-
-    public function test_getRequestOptions_withTemplateId(): void
-    {
-        // 测试包含模板ID的请求选项
-        $templateId = 'welcome_template_get_001';
-        $this->request->setTemplateId($templateId);
+        $this->request->setTemplateId('');
+        $this->assertSame('', $this->request->getTemplateId());
 
         $options = $this->request->getRequestOptions();
+        $this->assertIsArray($options);
         $this->assertArrayHasKey('json', $options);
-        $this->assertArrayHasKey('template_id', $options['json']);
-        $this->assertSame($templateId, $options['json']['template_id']);
+        $json = $options['json'];
+        $this->assertIsArray($json);
+        $this->assertArrayHasKey('template_id', $json);
+        $this->assertSame('', $json['template_id']);
     }
 
-    public function test_getRequestOptions_jsonStructure(): void
+    public function testTemplateIdWithSpecialCharacters(): void
     {
-        // 测试JSON结构的正确性
-        $templateId = 'structure_test_template';
+        $templateId = 'get_template_123@#$%';
+
         $this->request->setTemplateId($templateId);
+        $this->assertSame($templateId, $this->request->getTemplateId());
 
         $options = $this->request->getRequestOptions();
-        $this->assertCount(1, $options); // 只有json键
+        $this->assertIsArray($options);
         $this->assertArrayHasKey('json', $options);
-        $this->assertCount(1, $options['json']); // 只有template_id键
+        $json = $options['json'];
+        $this->assertIsArray($json);
+        $this->assertArrayHasKey('template_id', $json);
+        $this->assertSame($templateId, $json['template_id']);
+    }
+
+    public function testTemplateIdWithLongString(): void
+    {
+        $templateId = str_repeat('a', 1000);
+
+        $this->request->setTemplateId($templateId);
+        $this->assertSame($templateId, $this->request->getTemplateId());
+
+        $options = $this->request->getRequestOptions();
+        $this->assertIsArray($options);
+        $this->assertArrayHasKey('json', $options);
+        $json = $options['json'];
+        $this->assertIsArray($json);
+        $this->assertArrayHasKey('template_id', $json);
+        $this->assertSame($templateId, $json['template_id']);
+    }
+
+    public function testTemplateIdWithUnicode(): void
+    {
+        $templateId = '模板_测试_123';
+
+        $this->request->setTemplateId($templateId);
+        $this->assertSame($templateId, $this->request->getTemplateId());
+
+        $options = $this->request->getRequestOptions();
+        $this->assertIsArray($options);
+        $this->assertArrayHasKey('json', $options);
+        $json = $options['json'];
+        $this->assertIsArray($json);
+        $this->assertArrayHasKey('template_id', $json);
+        $this->assertSame($templateId, $json['template_id']);
+    }
+
+    public function testTemplateIdWithNumbersOnly(): void
+    {
+        $templateId = '1234567890';
+
+        $this->request->setTemplateId($templateId);
+        $this->assertSame($templateId, $this->request->getTemplateId());
+
+        $options = $this->request->getRequestOptions();
+        $this->assertIsArray($options);
+        $this->assertArrayHasKey('json', $options);
+        $json = $options['json'];
+        $this->assertIsArray($json);
+        $this->assertArrayHasKey('template_id', $json);
+        $this->assertSame($templateId, $json['template_id']);
+    }
+
+    public function testMultipleTemplateIdChanges(): void
+    {
+        $templateId1 = 'first_template';
+        $templateId2 = 'second_template';
+        $templateId3 = 'third_template';
+
+        $this->request->setTemplateId($templateId1);
+        $this->assertSame($templateId1, $this->request->getTemplateId());
+
+        $this->request->setTemplateId($templateId2);
+        $this->assertSame($templateId2, $this->request->getTemplateId());
+
+        $this->request->setTemplateId($templateId3);
+        $this->assertSame($templateId3, $this->request->getTemplateId());
+    }
+
+    public function testTemplateIdSetting(): void
+    {
+        $this->request->setTemplateId('fluent_template_789');
+        $this->assertSame('fluent_template_789', $this->request->getTemplateId());
+    }
+
+    public function testJsonStructureConsistency(): void
+    {
+        $templateId = 'consistency_test';
+        $this->request->setTemplateId($templateId);
+
+        $options = $this->request->getRequestOptions();
+
+        $this->assertIsArray($options);
+        $this->assertArrayHasKey('json', $options);
+        $this->assertIsArray($options['json']);
+        $this->assertCount(1, $options['json']); // Only template_id should be present
         $this->assertArrayHasKey('template_id', $options['json']);
     }
 
-    public function test_businessScenario_getTextTemplate(): void
+    public function testRequestOptionsAreImmutable(): void
     {
-        // 测试业务场景：获取文本欢迎语模板
-        $templateId = 'text_welcome_template_001';
-        $this->request->setTemplateId($templateId);
-
-        $options = $this->request->getRequestOptions();
-
-        $this->assertSame($templateId, $options['json']['template_id']);
-        $this->assertSame('/cgi-bin/externalcontact/group_welcome_template/get', $this->request->getRequestPath());
-    }
-
-    public function test_businessScenario_getRichMediaTemplate(): void
-    {
-        // 测试业务场景：获取富媒体欢迎语模板
-        $templateId = 'rich_media_template_002';
-        $this->request->setTemplateId($templateId);
-
-        $options = $this->request->getRequestOptions();
-
-        $this->assertSame($templateId, $options['json']['template_id']);
-        $this->assertArrayHasKey('template_id', $options['json']);
-    }
-
-    public function test_businessScenario_getMiniprogramTemplate(): void
-    {
-        // 测试业务场景：获取小程序欢迎语模板
-        $templateId = 'miniprogram_welcome_template_003';
-        $this->request->setTemplateId($templateId);
-
-        $options = $this->request->getRequestOptions();
-
-        $this->assertSame($templateId, $options['json']['template_id']);
-    }
-
-    public function test_businessScenario_getArchivedTemplate(): void
-    {
-        // 测试业务场景：获取归档的欢迎语模板
-        $templateId = 'archived_template_004';
-        $this->request->setTemplateId($templateId);
-
-        $options = $this->request->getRequestOptions();
-
-        $this->assertSame($templateId, $options['json']['template_id']);
-    }
-
-    public function test_businessScenario_getDepartmentTemplate(): void
-    {
-        // 测试业务场景：获取部门专用欢迎语模板
-        $templateId = 'dept_sales_template_005';
-        $this->request->setTemplateId($templateId);
-
-        $options = $this->request->getRequestOptions();
-
-        $this->assertSame($templateId, $options['json']['template_id']);
-    }
-
-    public function test_templateId_requiredForGet(): void
-    {
-        // 测试获取操作需要模板ID
-        $this->expectException(\Error::class); // 访问未初始化的属性会抛出Error
-        
-        $this->request->getTemplateId();
-    }
-
-    public function test_templateId_immutable(): void
-    {
-        // 测试模板ID的不可变性（每次设置都会覆盖）
-        $firstId = 'first_template_id';
-        $secondId = 'second_template_id';
-
-        $this->request->setTemplateId($firstId);
-        $this->assertSame($firstId, $this->request->getTemplateId());
-
-        $this->request->setTemplateId($secondId);
-        $this->assertSame($secondId, $this->request->getTemplateId());
-        $this->assertNotSame($firstId, $this->request->getTemplateId());
-    }
-
-    public function test_requestPath_immutable(): void
-    {
-        // 测试请求路径的不可变性
-        $path1 = $this->request->getRequestPath();
-        $this->request->setTemplateId('some_template');
-        $path2 = $this->request->getRequestPath();
-
-        $this->assertSame($path1, $path2);
-        $this->assertSame('/cgi-bin/externalcontact/group_welcome_template/get', $path1);
-    }
-
-    public function test_requestOptions_idempotent(): void
-    {
-        // 测试请求选项的幂等性
-        $templateId = 'idempotent_test_template';
+        $templateId = 'immutable_test';
         $this->request->setTemplateId($templateId);
 
         $options1 = $this->request->getRequestOptions();
         $options2 = $this->request->getRequestOptions();
 
-        $this->assertEquals($options1, $options2);
-        $this->assertSame($options1['json']['template_id'], $options2['json']['template_id']);
+        $this->assertSame($options1, $options2);
+        $this->assertIsArray($options1);
+        $this->assertArrayHasKey('json', $options1);
+        $json1 = $options1['json'];
+        $this->assertIsArray($json1);
+        $this->assertSame($templateId, $json1['template_id']);
+
+        $this->assertIsArray($options2);
+        $this->assertArrayHasKey('json', $options2);
+        $json2 = $options2['json'];
+        $this->assertIsArray($json2);
+        $this->assertSame($templateId, $json2['template_id']);
     }
-
-    public function test_templateId_boundaryCases(): void
-    {
-        // 测试边界情况：极短和极长的模板ID
-        $shortId = 'a';
-        $longId = str_repeat('template_id_', 100) . 'end';
-
-        $this->request->setTemplateId($shortId);
-        $this->assertSame($shortId, $this->request->getTemplateId());
-
-        $this->request->setTemplateId($longId);
-        $this->assertSame($longId, $this->request->getTemplateId());
-    }
-
-    public function test_multipleTemplateIdChanges(): void
-    {
-        // 测试多次更改模板ID
-        $ids = ['id1', 'id2', 'id3', 'id4', 'id5'];
-
-        foreach ($ids as $id) {
-            $this->request->setTemplateId($id);
-            $this->assertSame($id, $this->request->getTemplateId());
-            
-            $options = $this->request->getRequestOptions();
-            $this->assertSame($id, $options['json']['template_id']);
-        }
-    }
-
-    public function test_requestOptionsFormat(): void
-    {
-        // 测试请求选项格式的一致性
-        $templateId = 'format_test_template';
-        $this->request->setTemplateId($templateId);
-
-        $options = $this->request->getRequestOptions();
-
-        // 验证格式符合企业微信API要求
-        $this->assertArrayHasKey('json', $options);
-        $this->assertArrayHasKey('template_id', $options['json']);
-    }
-} 
+}

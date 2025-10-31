@@ -1,9 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace WechatWorkGroupWelcomeTemplateBundle\Request;
 
 use HttpClientBundle\Request\ApiRequest;
 use WechatWorkBundle\Request\AgentAware;
+use WechatWorkGroupWelcomeTemplateBundle\Entity\GroupWelcomeTemplate;
 
 /**
  * 添加入群欢迎语素材
@@ -20,14 +23,31 @@ class EditGroupWelcomeTemplateRequest extends ApiRequest
      */
     private string $templateId;
 
+    public static function createFromEntity(GroupWelcomeTemplate $template): self
+    {
+        $request = new self();
+        $request->populateFromEntity($template);
+
+        $templateId = $template->getTemplateId();
+        if (null !== $templateId) {
+            $request->setTemplateId($templateId);
+        }
+
+        return $request;
+    }
+
     public function getRequestPath(): string
     {
         return '/cgi-bin/externalcontact/group_welcome_template/edit';
     }
 
-    public function getRequestOptions(): ?array
+    /**
+     * @return array<string, mixed>
+     */
+    public function getRequestOptions(): array
     {
         $json = $this->getFieldJson();
+        $json['template_id'] = $this->getTemplateId();
 
         return [
             'json' => $json,

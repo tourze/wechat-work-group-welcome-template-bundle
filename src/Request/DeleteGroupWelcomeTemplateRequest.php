@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace WechatWorkGroupWelcomeTemplateBundle\Request;
 
 use HttpClientBundle\Request\ApiRequest;
@@ -24,7 +26,10 @@ class DeleteGroupWelcomeTemplateRequest extends ApiRequest
         return '/cgi-bin/externalcontact/group_welcome_template/del';
     }
 
-    public function getRequestOptions(): ?array
+    /**
+     * @return array<string, mixed>
+     */
+    public function getRequestOptions(): array
     {
         return [
             'json' => [

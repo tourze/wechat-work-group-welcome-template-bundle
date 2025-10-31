@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace WechatWorkGroupWelcomeTemplateBundle\Request;
 
 use WechatWorkGroupWelcomeTemplateBundle\Entity\GroupWelcomeTemplate;
@@ -76,33 +78,33 @@ trait FieldTrait
      */
     private ?string $videoMediaId = null;
 
-    public static function createFromEntity(GroupWelcomeTemplate $template): static
+    protected function populateFromEntity(GroupWelcomeTemplate $template): void
     {
-        $request = new static();
-        $request->setAgent($template->getAgent());
-        $request->setNotify($template->isNotify());
+        $this->setAgent($template->getAgent());
+        $this->setNotify($template->isNotify() ?? false);
 
-        $request->setTextContent($template->getTextContent());
+        $this->setTextContent($template->getTextContent());
 
-        $request->setImageMediaId($template->getImageMedia()?->getMediaId());
+        $this->setImageMediaId($template->getImageMedia()?->getMediaId());
 
-        $request->setLinkTitle($template->getLinkTitle());
-        $request->setLinkPicUrl($template->getLinkPicUrl());
-        $request->setLinkDesc($template->getLinkDesc());
-        $request->setLinkUrl($template->getLinkUrl());
+        $this->setLinkTitle($template->getLinkTitle());
+        $this->setLinkPicUrl($template->getLinkPicUrl());
+        $this->setLinkDesc($template->getLinkDesc());
+        $this->setLinkUrl($template->getLinkUrl());
 
-        $request->setMiniprogramTitle($template->getMiniprogramTitle());
-        $request->setMiniprogramAppId($template->getMiniprogramAppId());
-        $request->setMiniprogramPage($template->getMiniprogramPage());
-        $request->setMiniprogramPicMediaId($template->getMiniprogramMedia()?->getMediaId());
+        $this->setMiniprogramTitle($template->getMiniprogramTitle());
+        $this->setMiniprogramAppId($template->getMiniprogramAppId());
+        $this->setMiniprogramPage($template->getMiniprogramPage());
+        $this->setMiniprogramPicMediaId($template->getMiniprogramMedia()?->getMediaId());
 
-        $request->setFileMediaId($template->getFileMedia()?->getMediaId());
+        $this->setFileMediaId($template->getFileMedia()?->getMediaId());
 
-        $request->setVideoMediaId($template->getVideoMedia()?->getMediaId());
-
-        return $request;
+        $this->setVideoMediaId($template->getVideoMedia()?->getMediaId());
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     public function getFieldJson(): array
     {
         $json = [
@@ -164,9 +166,9 @@ trait FieldTrait
         return $this->notify;
     }
 
-    public function setNotify(bool $notify): void
+    public function setNotify(?bool $notify): void
     {
-        $this->notify = $notify;
+        $this->notify = $notify ?? false;
     }
 
     public function getTextContent(): ?string

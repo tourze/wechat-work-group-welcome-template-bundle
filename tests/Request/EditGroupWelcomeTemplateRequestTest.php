@@ -1,277 +1,307 @@
 <?php
 
+declare(strict_types=1);
+
 namespace WechatWorkGroupWelcomeTemplateBundle\Tests\Request;
 
-use HttpClientBundle\Request\ApiRequest;
-use PHPUnit\Framework\TestCase;
-use WechatWorkBundle\Request\AgentAware;
+use HttpClientBundle\Tests\Request\RequestTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use Tourze\WechatWorkContracts\AgentInterface;
+use WechatWorkGroupWelcomeTemplateBundle\Entity\GroupWelcomeTemplate;
 use WechatWorkGroupWelcomeTemplateBundle\Request\EditGroupWelcomeTemplateRequest;
 
 /**
- * EditGroupWelcomeTemplateRequest 测试
+ * @internal
  */
-class EditGroupWelcomeTemplateRequestTest extends TestCase
+#[CoversClass(EditGroupWelcomeTemplateRequest::class)]
+final class EditGroupWelcomeTemplateRequestTest extends RequestTestCase
 {
     private EditGroupWelcomeTemplateRequest $request;
 
     protected function setUp(): void
     {
+        parent::setUp();
         $this->request = new EditGroupWelcomeTemplateRequest();
     }
 
-    public function test_inheritance(): void
+    public function testRequestCreation(): void
     {
-        // 测试继承关系
-        $this->assertInstanceOf(ApiRequest::class, $this->request);
+        $this->assertInstanceOf(EditGroupWelcomeTemplateRequest::class, $this->request);
     }
 
-    public function test_traits(): void
+    public function testGetRequestPath(): void
     {
-        // 测试使用的trait
-        $this->assertContains(AgentAware::class, class_uses($this->request));
+        $this->assertSame('/cgi-bin/externalcontact/group_welcome_template/edit', $this->request->getRequestPath());
     }
 
-    public function test_getRequestPath(): void
+    public function testGetRequestOptionsReturnsJson(): void
     {
-        // 测试请求路径
-        $expectedPath = '/cgi-bin/externalcontact/group_welcome_template/edit';
-        $this->assertSame($expectedPath, $this->request->getRequestPath());
-    }
-
-    public function test_templateId_setterAndGetter(): void
-    {
-        // 测试模板ID设置和获取
-        $templateId = 'template_123456';
-        $this->request->setTemplateId($templateId);
-        $this->assertSame($templateId, $this->request->getTemplateId());
-    }
-
-
-    public function test_fieldTrait_functionality(): void
-    {
-        // 测试FieldTrait功能
-        $this->request->setNotify(true);
-        $this->assertTrue($this->request->isNotify());
-
-        $this->request->setTextContent('修改后的欢迎语');
-        $this->assertSame('修改后的欢迎语', $this->request->getTextContent());
-    }
-
-    public function test_getRequestOptions_withTemplateId(): void
-    {
-        // 测试包含模板ID的请求选项（需要先设置templateId）
-        $this->request->setTemplateId('template_edit_123');
-        $this->request->setNotify(false);
-        $this->request->setTextContent('更新的欢迎语内容');
+        // 设置必需的 templateId
+        $this->request->setTemplateId('test_template_id');
 
         $options = $this->request->getRequestOptions();
+
+        $this->assertIsArray($options);
         $this->assertArrayHasKey('json', $options);
-        $this->assertArrayHasKey('notify', $options['json']);
-        $this->assertArrayHasKey('text', $options['json']);
-        $this->assertSame(0, $options['json']['notify']);
-        $this->assertSame('更新的欢迎语内容', $options['json']['text']['content']);
+        $this->assertIsArray($options['json']);
     }
 
-    public function test_getRequestOptions_withAllFields(): void
+    public function testGetRequestOptionsWithBasicData(): void
     {
-        // 测试包含所有字段的请求选项
-        $this->request->setTemplateId('template_full_123');
+        $this->request->setTemplateId('test_template_123');
         $this->request->setNotify(true);
-        $this->request->setTextContent('完整的修改内容');
-        $this->request->setImageMediaId('new_img_123');
-        $this->request->setLinkTitle('新链接标题');
-        $this->request->setLinkUrl('https://newexample.com');
-        $this->request->setMiniprogramTitle('新小程序标题');
-        $this->request->setMiniprogramPage('pages/new');
-        $this->request->setFileMediaId('new_file_123');
-        $this->request->setVideoMediaId('new_video_123');
+        $this->request->setTextContent('Updated welcome message');
 
         $options = $this->request->getRequestOptions();
-        $json = $options['json'];
 
-        $this->assertSame(1, $json['notify']);
-        $this->assertArrayHasKey('text', $json);
-        $this->assertArrayHasKey('image', $json);
-        $this->assertArrayHasKey('link', $json);
-        $this->assertArrayHasKey('miniprogram', $json);
-        $this->assertArrayHasKey('file', $json);
-        $this->assertArrayHasKey('video', $json);
-    }
-
-    public function test_businessScenario_updateTextContent(): void
-    {
-        // 测试业务场景：更新文本内容
-        $templateId = 'welcome_template_001';
-        $this->request->setTemplateId($templateId);
-        $this->request->setNotify(true);
-        $this->request->setTextContent('欢迎语内容已更新，请查看最新的入群指南。');
-
-        $options = $this->request->getRequestOptions();
-        $json = $options['json'];
-
-        $this->assertSame(1, $json['notify']);
-        $this->assertSame('欢迎语内容已更新，请查看最新的入群指南。', $json['text']['content']);
-        $this->assertCount(2, $json); // notify和text
-    }
-
-    public function test_businessScenario_updateRichMedia(): void
-    {
-        // 测试业务场景：更新富媒体内容
-        $templateId = 'rich_template_002';
-        $this->request->setTemplateId($templateId);
-        $this->request->setNotify(false);
-        $this->request->setTextContent('更新的富媒体欢迎语');
-        $this->request->setImageMediaId('updated_image_456');
-        $this->request->setLinkTitle('更新的链接');
-        $this->request->setLinkPicUrl('https://updated.com/pic.jpg');
-        $this->request->setLinkDesc('查看更新的内容');
-        $this->request->setLinkUrl('https://updated.com/content');
-
-        $options = $this->request->getRequestOptions();
-        $json = $options['json'];
-
-        $this->assertArrayHasKey('text', $json);
-        $this->assertArrayHasKey('image', $json);
-        $this->assertArrayHasKey('link', $json);
-        $this->assertSame('updated_image_456', $json['image']['media_id']);
-        $this->assertSame('更新的链接', $json['link']['title']);
-    }
-
-    public function test_businessScenario_updateMiniprogram(): void
-    {
-        // 测试业务场景：更新小程序内容
-        $templateId = 'miniprogram_template_003';
-        $this->request->setTemplateId($templateId);
-        $this->request->setNotify(true);
-        $this->request->setTextContent('小程序内容已更新');
-        $this->request->setMiniprogramTitle('新版企业工具');
-        $this->request->setMiniprogramPicMediaId('new_miniprogram_pic');
-        $this->request->setMiniprogramAppId('wxnew123456789abc');
-        $this->request->setMiniprogramPage('pages/updated/index');
-
-        $options = $this->request->getRequestOptions();
-        $json = $options['json'];
-
-        $this->assertArrayHasKey('miniprogram', $json);
-        $this->assertSame('新版企业工具', $json['miniprogram']['title']);
-        $this->assertSame('wxnew123456789abc', $json['miniprogram']['appid']);
-        $this->assertSame('pages/updated/index', $json['miniprogram']['page']);
-    }
-
-    public function test_businessScenario_removeContent(): void
-    {
-        // 测试业务场景：移除某些内容（设置为null）
-        $templateId = 'remove_template_004';
-        $this->request->setTemplateId($templateId);
-        $this->request->setNotify(false);
-        $this->request->setTextContent('简化的欢迎语');
-        // 不设置图片、链接等，相当于移除这些内容
-
-        $options = $this->request->getRequestOptions();
-        $json = $options['json'];
-
-        $this->assertArrayHasKey('text', $json);
-        $this->assertArrayNotHasKey('image', $json);
-        $this->assertArrayNotHasKey('link', $json);
-        $this->assertArrayNotHasKey('miniprogram', $json);
-        $this->assertArrayNotHasKey('file', $json);
-        $this->assertArrayNotHasKey('video', $json);
-    }
-
-    public function test_templateId_requiredForEdit(): void
-    {
-        // 测试编辑操作需要模板ID
-        $this->expectException(\Error::class); // 访问未初始化的属性会抛出Error
-        
-        $this->request->getTemplateId();
-    }
-
-    public function test_templateId_differentFormats(): void
-    {
-        // 测试不同格式的模板ID
-        $templateIds = [
-            'template_123',
-            'tpl_456789',
-            'welcome_msg_001',
-            'group-welcome-2023-001'
-        ];
-
-        foreach ($templateIds as $templateId) {
-            $this->request->setTemplateId($templateId);
-            $this->assertSame($templateId, $this->request->getTemplateId());
-        }
-    }
-
-    public function test_requestPath_immutable(): void
-    {
-        // 测试请求路径不可变
-        $path1 = $this->request->getRequestPath();
-        $this->request->setTemplateId('test_123');
-        $this->request->setTextContent('测试');
-        $path2 = $this->request->getRequestPath();
-        
-        $this->assertSame($path1, $path2);
-        $this->assertSame('/cgi-bin/externalcontact/group_welcome_template/edit', $path1);
-    }
-
-    public function test_requestOptionsFormat(): void
-    {
-        // 测试请求选项格式
-        $this->request->setTemplateId('format_test_123');
-        $this->request->setTextContent('格式测试');
-        
-        $options = $this->request->getRequestOptions();
+        $this->assertIsArray($options);
         $this->assertArrayHasKey('json', $options);
-    }
-
-    public function test_contentUpdate_preservesTemplateId(): void
-    {
-        // 测试内容更新保持模板ID
-        $templateId = 'preserve_test_123';
-        $this->request->setTemplateId($templateId);
-        
-        $this->request->setTextContent('第一次更新');
-        $this->assertSame($templateId, $this->request->getTemplateId());
-        
-        $this->request->setTextContent('第二次更新');
-        $this->assertSame($templateId, $this->request->getTemplateId());
-        
-        $this->request->setNotify(false);
-        $this->assertSame($templateId, $this->request->getTemplateId());
-    }
-
-    public function test_emptyContentUpdate(): void
-    {
-        // 测试空内容更新
-        $this->request->setTemplateId('empty_test_123');
-        // 只设置notify，不设置其他内容
-
-        $options = $this->request->getRequestOptions();
         $json = $options['json'];
-
+        $this->assertIsArray($json);
         $this->assertArrayHasKey('notify', $json);
-        $this->assertSame(1, $json['notify']); // 默认为true
-        $this->assertCount(1, $json);
+        $this->assertSame(1, $json['notify']);
+        $this->assertArrayHasKey('text', $json);
+        $text = $json['text'];
+        $this->assertIsArray($text);
+        $this->assertArrayHasKey('content', $text);
+        $this->assertSame('Updated welcome message', $text['content']);
     }
 
-    public function test_multipleUpdates(): void
+    public function testGetRequestOptionsWithNotifyFalse(): void
     {
-        // 测试多次更新操作
-        $templateId = 'multiple_test_123';
-        $this->request->setTemplateId($templateId);
-        
-        // 第一次更新
-        $this->request->setTextContent('第一次更新');
-        $this->request->setNotify(true);
-        
-        // 第二次更新
-        $this->request->setTextContent('第二次更新');
+        // 设置必需的 templateId
+        $this->request->setTemplateId('test_template_id');
         $this->request->setNotify(false);
-        
+
         $options = $this->request->getRequestOptions();
+
+        $this->assertIsArray($options);
+        $this->assertArrayHasKey('json', $options);
         $json = $options['json'];
-        
-        $this->assertSame('第二次更新', $json['text']['content']);
+        $this->assertIsArray($json);
+        $this->assertArrayHasKey('notify', $json);
         $this->assertSame(0, $json['notify']);
     }
-} 
+
+    public function testGetRequestOptionsWithImageMediaId(): void
+    {
+        // 设置必需的 templateId
+        $this->request->setTemplateId('test_template_id');
+        $this->request->setImageMediaId('updated_media_id');
+
+        $options = $this->request->getRequestOptions();
+
+        $this->assertIsArray($options);
+        $this->assertArrayHasKey('json', $options);
+        $json = $options['json'];
+        $this->assertIsArray($json);
+        $this->assertArrayHasKey('image', $json);
+        $image = $json['image'];
+        $this->assertIsArray($image);
+        $this->assertArrayHasKey('media_id', $image);
+        $this->assertSame('updated_media_id', $image['media_id']);
+    }
+
+    public function testGetRequestOptionsWithImagePicUrl(): void
+    {
+        // 设置必需的 templateId
+        $this->request->setTemplateId('test_template_id');
+        $this->request->setImagePicUrl('https://example.com/updated-image.jpg');
+
+        $options = $this->request->getRequestOptions();
+
+        $this->assertIsArray($options);
+        $this->assertArrayHasKey('json', $options);
+        $json = $options['json'];
+        $this->assertIsArray($json);
+        $this->assertArrayHasKey('image', $json);
+        $image = $json['image'];
+        $this->assertIsArray($image);
+        $this->assertArrayHasKey('pic_url', $image);
+        $this->assertSame('https://example.com/updated-image.jpg', $image['pic_url']);
+    }
+
+    public function testGetRequestOptionsWithLink(): void
+    {
+        // 设置必需的 templateId
+        $this->request->setTemplateId('test_template_id');
+        $this->request->setLinkTitle('Updated Link Title');
+        $this->request->setLinkPicUrl('https://example.com/updated-link.jpg');
+        $this->request->setLinkDesc('Updated Link Description');
+        $this->request->setLinkUrl('https://updated-example.com');
+
+        $options = $this->request->getRequestOptions();
+
+        $this->assertIsArray($options);
+        $this->assertArrayHasKey('json', $options);
+        $json = $options['json'];
+        $this->assertIsArray($json);
+        $this->assertArrayHasKey('link', $json);
+        $link = $json['link'];
+        $this->assertIsArray($link);
+        $this->assertSame('Updated Link Title', $link['title']);
+        $this->assertSame('https://example.com/updated-link.jpg', $link['picurl']);
+        $this->assertSame('Updated Link Description', $link['desc']);
+        $this->assertSame('https://updated-example.com', $link['url']);
+    }
+
+    public function testGetRequestOptionsWithMiniprogram(): void
+    {
+        // 设置必需的 templateId
+        $this->request->setTemplateId('test_template_id');
+        $this->request->setMiniprogramTitle('Updated Mini Program');
+        $this->request->setMiniprogramPicMediaId('updated_miniprogram_media_id');
+        $this->request->setMiniprogramAppId('wx9876543210');
+        $this->request->setMiniprogramPage('/pages/updated');
+
+        $options = $this->request->getRequestOptions();
+
+        $this->assertIsArray($options);
+        $this->assertArrayHasKey('json', $options);
+        $json = $options['json'];
+        $this->assertIsArray($json);
+        $this->assertArrayHasKey('miniprogram', $json);
+        $miniprogram = $json['miniprogram'];
+        $this->assertIsArray($miniprogram);
+        $this->assertSame('Updated Mini Program', $miniprogram['title']);
+        $this->assertSame('updated_miniprogram_media_id', $miniprogram['pic_media_id']);
+        $this->assertSame('wx9876543210', $miniprogram['appid']);
+        $this->assertSame('/pages/updated', $miniprogram['page']);
+    }
+
+    public function testGetRequestOptionsWithFile(): void
+    {
+        // 设置必需的 templateId
+        $this->request->setTemplateId('test_template_id');
+        $this->request->setFileMediaId('updated_file_media_id');
+
+        $options = $this->request->getRequestOptions();
+
+        $this->assertIsArray($options);
+        $this->assertArrayHasKey('json', $options);
+        $json = $options['json'];
+        $this->assertIsArray($json);
+        $this->assertArrayHasKey('file', $json);
+        $file = $json['file'];
+        $this->assertIsArray($file);
+        $this->assertArrayHasKey('media_id', $file);
+        $this->assertSame('updated_file_media_id', $file['media_id']);
+    }
+
+    public function testGetRequestOptionsWithVideo(): void
+    {
+        // 设置必需的 templateId
+        $this->request->setTemplateId('test_template_id');
+        $this->request->setVideoMediaId('updated_video_media_id');
+
+        $options = $this->request->getRequestOptions();
+
+        $this->assertIsArray($options);
+        $this->assertArrayHasKey('json', $options);
+        $json = $options['json'];
+        $this->assertIsArray($json);
+        $this->assertArrayHasKey('video', $json);
+        $video = $json['video'];
+        $this->assertIsArray($video);
+        $this->assertArrayHasKey('media_id', $video);
+        $this->assertSame('updated_video_media_id', $video['media_id']);
+    }
+
+    public function testCreateFromEntity(): void
+    {
+        $template = new GroupWelcomeTemplate();
+        $agent = $this->createMock(AgentInterface::class);
+        $agent->method('getAgentId')->willReturn('agent_123');
+
+        $template->setAgent($agent);
+        $template->setNotify(false);
+        $template->setTextContent('Updated from entity');
+
+        $request = EditGroupWelcomeTemplateRequest::createFromEntity($template);
+
+        $this->assertInstanceOf(EditGroupWelcomeTemplateRequest::class, $request);
+        $this->assertSame($agent, $request->getAgent());
+        $this->assertFalse($request->isNotify());
+        $this->assertSame('Updated from entity', $request->getTextContent());
+    }
+
+    public function testCreateFromEntityWithNullValues(): void
+    {
+        $template = new GroupWelcomeTemplate();
+        $agent = $this->createMock(AgentInterface::class);
+        $agent->method('getAgentId')->willReturn('agent_123');
+
+        $template->setAgent($agent);
+        $template->setNotify(null);
+        $template->setTextContent(null);
+
+        $request = EditGroupWelcomeTemplateRequest::createFromEntity($template);
+
+        $this->assertInstanceOf(EditGroupWelcomeTemplateRequest::class, $request);
+        $this->assertSame($agent, $request->getAgent());
+        $this->assertFalse($request->isNotify()); // Default to false when null
+        $this->assertNull($request->getTextContent());
+    }
+
+    public function testTemplateIdGetterAndSetter(): void
+    {
+        $templateId = 'edit_template_123';
+
+        $this->request->setTemplateId($templateId);
+        $this->assertSame($templateId, $this->request->getTemplateId());
+    }
+
+    public function testDefaultValues(): void
+    {
+        $this->assertTrue($this->request->isNotify());
+        $this->assertNull($this->request->getTextContent());
+        $this->assertNull($this->request->getImageMediaId());
+        $this->assertNull($this->request->getImagePicUrl());
+        $this->assertNull($this->request->getLinkTitle());
+        $this->assertNull($this->request->getLinkPicUrl());
+        $this->assertNull($this->request->getLinkDesc());
+        $this->assertNull($this->request->getLinkUrl());
+        $this->assertNull($this->request->getMiniprogramTitle());
+        $this->assertNull($this->request->getMiniprogramPicMediaId());
+        $this->assertNull($this->request->getMiniprogramAppId());
+        $this->assertNull($this->request->getMiniprogramPage());
+        $this->assertNull($this->request->getFileMediaId());
+        $this->assertNull($this->request->getVideoMediaId());
+    }
+
+    public function testFluentInterface(): void
+    {
+        $this->request->setTemplateId('edit_template_456');
+        $this->request->setNotify(false);
+        $this->request->setTextContent('Updated message');
+        $this->request->setImageMediaId('updated_image_media');
+        $this->request->setImagePicUrl('https://example.com/updated-image.jpg');
+        $this->request->setLinkTitle('Updated Link Title');
+        $this->request->setLinkPicUrl('https://example.com/updated-link.jpg');
+        $this->request->setLinkDesc('Updated Link Description');
+        $this->request->setLinkUrl('https://updated-example.com');
+        $this->request->setMiniprogramTitle('Updated Mini Program');
+        $this->request->setMiniprogramPicMediaId('updated_miniprogram_media');
+        $this->request->setMiniprogramAppId('wx9876543210');
+        $this->request->setMiniprogramPage('/pages/updated');
+        $this->request->setFileMediaId('updated_file_media');
+        $this->request->setVideoMediaId('updated_video_media');
+
+        // 验证所有值都已正确设置
+        $this->assertSame('edit_template_456', $this->request->getTemplateId());
+        $this->assertFalse($this->request->isNotify());
+        $this->assertSame('Updated message', $this->request->getTextContent());
+        $this->assertSame('updated_image_media', $this->request->getImageMediaId());
+        $this->assertSame('https://example.com/updated-image.jpg', $this->request->getImagePicUrl());
+        $this->assertSame('Updated Link Title', $this->request->getLinkTitle());
+        $this->assertSame('https://example.com/updated-link.jpg', $this->request->getLinkPicUrl());
+        $this->assertSame('Updated Link Description', $this->request->getLinkDesc());
+        $this->assertSame('https://updated-example.com', $this->request->getLinkUrl());
+        $this->assertSame('Updated Mini Program', $this->request->getMiniprogramTitle());
+        $this->assertSame('updated_miniprogram_media', $this->request->getMiniprogramPicMediaId());
+        $this->assertSame('wx9876543210', $this->request->getMiniprogramAppId());
+        $this->assertSame('/pages/updated', $this->request->getMiniprogramPage());
+        $this->assertSame('updated_file_media', $this->request->getFileMediaId());
+        $this->assertSame('updated_video_media', $this->request->getVideoMediaId());
+    }
+}

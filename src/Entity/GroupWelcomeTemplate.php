@@ -1,13 +1,15 @@
 <?php
 
+declare(strict_types=1);
+
 namespace WechatWorkGroupWelcomeTemplateBundle\Entity;
 
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Attribute\Groups;
+use Symfony\Component\Validator\Constraints as Assert;
 use Tourze\DoctrineIndexedBundle\Attribute\IndexColumn;
-use Tourze\DoctrineIpBundle\Attribute\CreateIpColumn;
-use Tourze\DoctrineIpBundle\Attribute\UpdateIpColumn;
+use Tourze\DoctrineIpBundle\Traits\IpTraceableAware;
 use Tourze\DoctrineSnowflakeBundle\Traits\SnowflakeKeyAware;
 use Tourze\DoctrineTimestampBundle\Traits\TimestampableAware;
 use Tourze\DoctrineTrackBundle\Attribute\TrackColumn;
@@ -26,47 +28,63 @@ class GroupWelcomeTemplate implements \Stringable
     use SnowflakeKeyAware;
     use TimestampableAware;
     use BlameableAware;
+    use IpTraceableAware;
 
     #[ORM\ManyToOne]
-    #[ORM\JoinColumn(nullable: false)]
+    #[ORM\JoinColumn(nullable: true)]
     private ?AgentInterface $agent = null;
 
+    #[Assert\Length(max: 120)]
     #[ORM\Column(length: 120, nullable: true, options: ['comment' => '欢迎语素材id'])]
     private ?string $templateId = null;
 
+    #[Assert\Type(type: 'bool')]
     #[ORM\Column(nullable: true, options: ['comment' => '是否通知成员'])]
     private ?bool $notify = true;
 
+    #[Assert\Type(type: 'string')]
+    #[Assert\Length(max: 65535)]
     #[ORM\Column(type: Types::TEXT, nullable: true, options: ['comment' => '消息文本内容'])]
     private ?string $textContent = null;
 
     #[ORM\ManyToOne]
     private ?TempMedia $imageMedia = null;
 
+    #[Assert\Length(max: 255)]
+    #[Assert\Url]
     #[ORM\Column(length: 255, nullable: true, options: ['comment' => '图片链接'])]
     private ?string $imagePicUrl = null;
 
+    #[Assert\Length(max: 128)]
     #[ORM\Column(length: 128, nullable: true, options: ['comment' => '链接标题'])]
     private ?string $linkTitle = null;
 
+    #[Assert\Length(max: 255)]
+    #[Assert\Url]
     #[ORM\Column(length: 255, nullable: true, options: ['comment' => '链接图片URL'])]
     private ?string $linkPicUrl = null;
 
+    #[Assert\Length(max: 512)]
     #[ORM\Column(length: 512, nullable: true, options: ['comment' => '链接描述'])]
     private ?string $linkDesc = null;
 
+    #[Assert\Length(max: 255)]
+    #[Assert\Url]
     #[ORM\Column(length: 255, nullable: true, options: ['comment' => '链接URL'])]
     private ?string $linkUrl = null;
 
+    #[Assert\Length(max: 64)]
     #[ORM\Column(length: 64, nullable: true, options: ['comment' => '小程序标题'])]
     private ?string $miniprogramTitle = null;
 
     #[ORM\ManyToOne]
     private ?TempMedia $miniprogramMedia = null;
 
+    #[Assert\Length(max: 64)]
     #[ORM\Column(length: 64, nullable: true, options: ['comment' => '小程序AppId'])]
     private ?string $miniprogramAppId = null;
 
+    #[Assert\Length(max: 255)]
     #[ORM\Column(length: 255, nullable: true, options: ['comment' => '小程序页面路径'])]
     private ?string $miniprogramPage = null;
 
@@ -76,32 +94,21 @@ class GroupWelcomeTemplate implements \Stringable
     #[ORM\ManyToOne]
     private ?TempMedia $videoMedia = null;
 
+    #[Assert\Type(type: 'bool')]
     #[IndexColumn]
     #[TrackColumn]
     #[Groups(groups: ['admin_curd'])]
     #[ORM\Column(type: Types::BOOLEAN, nullable: true, options: ['comment' => '已同步', 'default' => 0])]
     private ?bool $sync = null;
 
-    #[CreateIpColumn]
-    #[ORM\Column(length: 128, nullable: true, options: ['comment' => '创建时IP'])]
-    private ?string $createdFromIp = null;
-
-    #[UpdateIpColumn]
-    #[ORM\Column(length: 128, nullable: true, options: ['comment' => '更新时IP'])]
-    private ?string $updatedFromIp = null;
-
-
-
     public function getAgent(): ?AgentInterface
     {
         return $this->agent;
     }
 
-    public function setAgent(?AgentInterface $agent): static
+    public function setAgent(?AgentInterface $agent): void
     {
         $this->agent = $agent;
-
-        return $this;
     }
 
     public function getTemplateId(): ?string
@@ -109,11 +116,9 @@ class GroupWelcomeTemplate implements \Stringable
         return $this->templateId;
     }
 
-    public function setTemplateId(?string $templateId): static
+    public function setTemplateId(?string $templateId): void
     {
         $this->templateId = $templateId;
-
-        return $this;
     }
 
     public function getTextContent(): ?string
@@ -121,11 +126,9 @@ class GroupWelcomeTemplate implements \Stringable
         return $this->textContent;
     }
 
-    public function setTextContent(?string $textContent): static
+    public function setTextContent(?string $textContent): void
     {
         $this->textContent = $textContent;
-
-        return $this;
     }
 
     public function isNotify(): ?bool
@@ -133,11 +136,9 @@ class GroupWelcomeTemplate implements \Stringable
         return $this->notify;
     }
 
-    public function setNotify(?bool $notify): static
+    public function setNotify(?bool $notify): void
     {
         $this->notify = $notify;
-
-        return $this;
     }
 
     public function getImageMedia(): ?TempMedia
@@ -145,11 +146,9 @@ class GroupWelcomeTemplate implements \Stringable
         return $this->imageMedia;
     }
 
-    public function setImageMedia(?TempMedia $imageMedia): static
+    public function setImageMedia(?TempMedia $imageMedia): void
     {
         $this->imageMedia = $imageMedia;
-
-        return $this;
     }
 
     public function getImagePicUrl(): ?string
@@ -157,11 +156,9 @@ class GroupWelcomeTemplate implements \Stringable
         return $this->imagePicUrl;
     }
 
-    public function setImagePicUrl(?string $imagePicUrl): static
+    public function setImagePicUrl(?string $imagePicUrl): void
     {
         $this->imagePicUrl = $imagePicUrl;
-
-        return $this;
     }
 
     public function getLinkTitle(): ?string
@@ -169,11 +166,9 @@ class GroupWelcomeTemplate implements \Stringable
         return $this->linkTitle;
     }
 
-    public function setLinkTitle(?string $linkTitle): static
+    public function setLinkTitle(?string $linkTitle): void
     {
         $this->linkTitle = $linkTitle;
-
-        return $this;
     }
 
     public function getLinkPicUrl(): ?string
@@ -181,11 +176,9 @@ class GroupWelcomeTemplate implements \Stringable
         return $this->linkPicUrl;
     }
 
-    public function setLinkPicUrl(?string $linkPicUrl): static
+    public function setLinkPicUrl(?string $linkPicUrl): void
     {
         $this->linkPicUrl = $linkPicUrl;
-
-        return $this;
     }
 
     public function getLinkDesc(): ?string
@@ -193,11 +186,9 @@ class GroupWelcomeTemplate implements \Stringable
         return $this->linkDesc;
     }
 
-    public function setLinkDesc(?string $linkDesc): static
+    public function setLinkDesc(?string $linkDesc): void
     {
         $this->linkDesc = $linkDesc;
-
-        return $this;
     }
 
     public function getLinkUrl(): ?string
@@ -205,11 +196,9 @@ class GroupWelcomeTemplate implements \Stringable
         return $this->linkUrl;
     }
 
-    public function setLinkUrl(?string $linkUrl): static
+    public function setLinkUrl(?string $linkUrl): void
     {
         $this->linkUrl = $linkUrl;
-
-        return $this;
     }
 
     public function getMiniprogramTitle(): ?string
@@ -217,11 +206,9 @@ class GroupWelcomeTemplate implements \Stringable
         return $this->miniprogramTitle;
     }
 
-    public function setMiniprogramTitle(?string $miniprogramTitle): static
+    public function setMiniprogramTitle(?string $miniprogramTitle): void
     {
         $this->miniprogramTitle = $miniprogramTitle;
-
-        return $this;
     }
 
     public function getMiniprogramMedia(): ?TempMedia
@@ -229,11 +216,9 @@ class GroupWelcomeTemplate implements \Stringable
         return $this->miniprogramMedia;
     }
 
-    public function setMiniprogramMedia(?TempMedia $miniprogramMedia): static
+    public function setMiniprogramMedia(?TempMedia $miniprogramMedia): void
     {
         $this->miniprogramMedia = $miniprogramMedia;
-
-        return $this;
     }
 
     public function getMiniprogramAppId(): ?string
@@ -241,11 +226,9 @@ class GroupWelcomeTemplate implements \Stringable
         return $this->miniprogramAppId;
     }
 
-    public function setMiniprogramAppId(?string $miniprogramAppId): static
+    public function setMiniprogramAppId(?string $miniprogramAppId): void
     {
         $this->miniprogramAppId = $miniprogramAppId;
-
-        return $this;
     }
 
     public function getMiniprogramPage(): ?string
@@ -253,11 +236,9 @@ class GroupWelcomeTemplate implements \Stringable
         return $this->miniprogramPage;
     }
 
-    public function setMiniprogramPage(?string $miniprogramPage): static
+    public function setMiniprogramPage(?string $miniprogramPage): void
     {
         $this->miniprogramPage = $miniprogramPage;
-
-        return $this;
     }
 
     public function getFileMedia(): ?TempMedia
@@ -265,11 +246,9 @@ class GroupWelcomeTemplate implements \Stringable
         return $this->fileMedia;
     }
 
-    public function setFileMedia(?TempMedia $fileMedia): static
+    public function setFileMedia(?TempMedia $fileMedia): void
     {
         $this->fileMedia = $fileMedia;
-
-        return $this;
     }
 
     public function getVideoMedia(): ?TempMedia
@@ -277,11 +256,9 @@ class GroupWelcomeTemplate implements \Stringable
         return $this->videoMedia;
     }
 
-    public function setVideoMedia(?TempMedia $videoMedia): static
+    public function setVideoMedia(?TempMedia $videoMedia): void
     {
         $this->videoMedia = $videoMedia;
-
-        return $this;
     }
 
     public function isSync(): ?bool
@@ -289,36 +266,11 @@ class GroupWelcomeTemplate implements \Stringable
         return $this->sync;
     }
 
-    public function setSync(?bool $sync): self
+    public function setSync(?bool $sync): void
     {
         $this->sync = $sync;
-
-        return $this;
     }
 
-    public function setCreatedFromIp(?string $createdFromIp): self
-    {
-        $this->createdFromIp = $createdFromIp;
-
-        return $this;
-    }
-
-    public function getCreatedFromIp(): ?string
-    {
-        return $this->createdFromIp;
-    }
-
-    public function setUpdatedFromIp(?string $updatedFromIp): self
-    {
-        $this->updatedFromIp = $updatedFromIp;
-
-        return $this;
-    }
-
-    public function getUpdatedFromIp(): ?string
-    {
-        return $this->updatedFromIp;
-    }
     public function __toString(): string
     {
         return (string) $this->getId();
