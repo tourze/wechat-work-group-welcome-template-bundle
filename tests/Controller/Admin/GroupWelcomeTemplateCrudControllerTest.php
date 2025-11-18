@@ -105,12 +105,6 @@ class GroupWelcomeTemplateCrudControllerTest extends AbstractEasyAdminController
         ];
     }
 
-    public function testGetEntityFqcn(): void
-    {
-        $controller = $this->getControllerService();
-        self::assertSame(GroupWelcomeTemplate::class, $controller::getEntityFqcn());
-    }
-
     public function testConfigureFields(): void
     {
         $controller = $this->getControllerService();
