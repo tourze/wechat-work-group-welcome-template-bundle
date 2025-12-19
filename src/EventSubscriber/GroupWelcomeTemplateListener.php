@@ -9,7 +9,7 @@ use Doctrine\ORM\Events;
 use Monolog\Attribute\WithMonologChannel;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\Attribute\Autoconfigure;
-use WechatWorkBundle\Service\WorkService;
+use WechatWorkBundle\Service\WorkServiceInterface;
 use WechatWorkGroupWelcomeTemplateBundle\Entity\GroupWelcomeTemplate;
 use WechatWorkGroupWelcomeTemplateBundle\Request\AddGroupWelcomeTemplateRequest;
 use WechatWorkGroupWelcomeTemplateBundle\Request\DeleteGroupWelcomeTemplateRequest;
@@ -20,10 +20,10 @@ use WechatWorkGroupWelcomeTemplateBundle\Request\EditGroupWelcomeTemplateRequest
 #[AsEntityListener(event: Events::postRemove, method: 'postRemove', entity: GroupWelcomeTemplate::class)]
 #[Autoconfigure(public: true)]
 #[WithMonologChannel(channel: 'wechat_work_group_welcome_template')]
-class GroupWelcomeTemplateListener
+final class GroupWelcomeTemplateListener
 {
     public function __construct(
-        private readonly WorkService $workService,
+        private readonly WorkServiceInterface $workService,
         private readonly LoggerInterface $logger,
     ) {
     }

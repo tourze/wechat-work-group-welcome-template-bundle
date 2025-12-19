@@ -15,7 +15,7 @@ use WechatWorkGroupWelcomeTemplateBundle\Entity\GroupWelcomeTemplate;
  */
 #[Autoconfigure(public: true)]
 #[AsRepository(entityClass: GroupWelcomeTemplate::class)]
-class GroupWelcomeTemplateRepository extends ServiceEntityRepository
+final class GroupWelcomeTemplateRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
     {

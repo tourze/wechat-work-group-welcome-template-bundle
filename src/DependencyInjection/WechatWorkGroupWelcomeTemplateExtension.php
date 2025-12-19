@@ -6,7 +6,7 @@ namespace WechatWorkGroupWelcomeTemplateBundle\DependencyInjection;
 
 use Tourze\SymfonyDependencyServiceLoader\AutoExtension;
 
-class WechatWorkGroupWelcomeTemplateExtension extends AutoExtension
+final class WechatWorkGroupWelcomeTemplateExtension extends AutoExtension
 {
     protected function getConfigDir(): string
     {
